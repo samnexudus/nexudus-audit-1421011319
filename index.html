@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Audit — Nexudus Webinars</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Poppins, sans-serif;
+  background: #F8F8F8;
+  color: #535060;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ── Page wrapper ── */
+.page {
+  max-width: 960px;
+  margin: 48px auto;
+  background: #FDFDFD;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(33,44,106,0.10);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+header {
+  background: #212C6A;
+  color: #FDFDFD;
+  padding: 32px 48px 28px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+header img { height: 32px; width: auto; flex-shrink: 0; }
+header .header-text .label {
+  font-family: Parkinsans, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #C5CCFF;
+  margin-bottom: 6px;
+}
+header h1 {
+  font-family: Parkinsans, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #FDFDFD;
+  line-height: 1.29;
+}
+header .meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #C5CCFF;
+  font-family: Poppins, sans-serif;
+}
+
+/* ── Orange accent bar ── */
+.accent-bar {
+  height: 4px;
+  background: #FE4D00;
+}
+
+/* ── Score bar ── */
+.score-bar {
+  background: #F1F4FF;
+  border-bottom: 1px solid #C5CCFF;
+  padding: 20px 48px;
+  display: flex;
+  gap: 36px;
+  align-items: center;
+}
+.score-item {
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+  color: #535060;
+}
+.score-item strong {
+  display: block;
+  font-family: Parkinsans, sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #212C6A;
+  line-height: 1.1;
+}
+.score-item strong.orange { color: #FE4D00; }
+.score-divider {
+  width: 1px;
+  height: 36px;
+  background: #C5CCFF;
+}
+
+/* ── Body ── */
+.body { padding: 40px 48px 56px; }
+
+/* ── Section dropdowns ── */
+.section {
+  margin-bottom: 12px;
+  border: 1px solid #ECECEC;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.section summary {
+  list-style: none;
+}
+.section summary::-webkit-details-marker { display: none; }
+
+.section-title {
+  font-family: Parkinsans, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #212C6A;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  background: #FDFDFD;
+  transition: background 0.15s;
+}
+.section-title:hover { background: #F8F8F8; }
+.section-title .orange-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #FE4D00;
+  flex-shrink: 0;
+}
+.section-title-text { flex: 1; }
+.section-pills { display: flex; gap: 5px; }
+.section-chevron {
+  font-size: 18px;
+  color: #98989F;
+  transition: transform 0.2s;
+  line-height: 1;
+}
+details.section[open] .section-chevron { transform: rotate(90deg); }
+.section-body {
+  padding: 4px 14px 14px;
+  background: #F8F8F8;
+  border-top: 1px solid #ECECEC;
+}
+
+/* ── Summary table ── */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+  font-size: 13px;
+  font-family: Poppins, sans-serif;
+}
+.summary-table th {
+  font-family: Parkinsans, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #98989F;
+  border-bottom: 2px solid #ECECEC;
+  padding: 8px 12px;
+  text-align: left;
+}
+.summary-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #ECECEC;
+  vertical-align: middle;
+  color: #535060;
+}
+.summary-table tr:last-child td { border-bottom: none; }
+.summary-table .sname {
+  font-family: Parkinsans, sans-serif;
+  font-weight: 600;
+  color: #212C6A;
+}
+.summary-table .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── Check cards ── */
+.check {
+  border-radius: 12px;
+  border: 1px solid;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+}
+.check.pass { background:#E0FFF0; border-color:#9AE9B8; }
+.check.warn { background:#FFF2EC; border-color:#FFDACC; }
+.check.fail { background:#FFF0F5; border-color:#FFCCDF; }
+.check.skip { background:#F8F8F8; border-color:#ECECEC; }
+
+.check-header { display: flex; align-items: center; gap: 10px; }
+
+/* ── Badges ── */
+.badge {
+  font-family: Parkinsans, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #FDFDFD;
+  flex-shrink: 0;
+}
+.badge.pass { background: #28B95F; }
+.badge.warn { background: #FE4D00; }
+.badge.fail { background: #FF4F95; }
+.badge.skip { background: #98989F; }
+
+.check-name {
+  font-family: Parkinsans, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+.check.pass .check-name { color: #00703E; }
+.check.warn .check-name { color: #723031; }
+.check.fail .check-name { color: #6D1A3B; }
+.check.skip .check-name { color: #98989F; }
+
+.check-detail {
+  margin-top: 6px;
+  font-size: 13px;
+  font-family: Poppins, sans-serif;
+  color: #535060;
+}
+.check-hint {
+  margin-top: 6px;
+  font-size: 13px;
+  font-family: Poppins, sans-serif;
+  font-weight: 500;
+}
+.check.warn .check-hint { color: #FE4D00; }
+.check.fail .check-hint { color: #6D1A3B; }
+
+/* ── Mini pills (summary table counts) ── */
+.pill {
+  display: inline-block;
+  font-family: Parkinsans, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: #FDFDFD;
+}
+.pill.pass { background: #28B95F; }
+.pill.warn { background: #FE4D00; }
+.pill.fail { background: #FF4F95; }
+.pill.skip { background: #98989F; }
+
+/* ── Field table (location details etc.) ── */
+.field-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-family: Poppins, sans-serif;
+  font-size: 13px;
+}
+.field-table td {
+  padding: 4px 8px 4px 0;
+  vertical-align: top;
+  color: #535060;
+}
+.field-table .field-label {
+  font-family: Parkinsans, sans-serif;
+  font-weight: 600;
+  color: #212C6A;
+  white-space: nowrap;
+  width: 90px;
+}
+.field-table .field-missing {
+  color: #98989F;
+  font-style: italic;
+}
+.field-table.multi-col th {
+  font-family: Parkinsans, sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #98989F;
+  padding: 4px 16px 6px 0;
+  border-bottom: 1px solid #ECECEC;
+  text-align: left;
+}
+.field-table.multi-col td {
+  padding: 5px 16px 5px 0;
+  border-bottom: 1px solid #ECECEC;
+}
+.field-table.multi-col tr:last-child td { border-bottom: none; }
+
+/* ── Tabs ── */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #ECECEC;
+  margin-bottom: 24px;
+}
+.tab-btn {
+  font-family: Parkinsans, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #98989F;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 16px 12px;
+  margin-bottom: -2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.15s;
+}
+.tab-btn:hover { color: #212C6A; }
+.tab-btn.active {
+  color: #212C6A;
+  border-bottom-color: #FE4D00;
+}
+.tab-pills { display: flex; gap: 4px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.tab-description {
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  color: #535060;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.tab-empty {
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+  color: #98989F;
+  padding: 40px 0;
+  text-align: center;
+}
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid #ECECEC;
+  padding: 18px 48px;
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  color: #98989F;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+footer .watermark {
+  font-family: Parkinsans, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #CBCDD2;
+}
+
+/* ── Print ── */
+@media print {
+  body { background: #FDFDFD; }
+  .page { margin: 0; border-radius: 0; box-shadow: none; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAACvCAMAAAAWsFBmAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAvdQTFRFAAAA/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MO/1MOfCsxRAAAAP10Uk5TAAIMDVrY2Uix/7Mlb+HmmwkGRZPKwxcEVPJhGpD1AXv30hIVxlf+lQO8FPD0P2SF1BYK5P12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" alt="Nexudus">
+      <div class="header-text">
+        <div class="label">AI Agent Audit</div>
+        <h1>Nexudus Webinars</h1>
+        <div class="meta">Generated 29 June 2026</div>
+      </div>
+    </header>
+
+    <div class="accent-bar"></div>
+
+    <div class="score-bar">
+      <div class="score-item">
+        <strong class="orange">52%</strong>
+        Overall score
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-item">
+        <strong style="color:#28B95F">23</strong>
+        Passed
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-item">
+        <strong style="color:#FE4D00">18</strong>
+        Warnings
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-item">
+        <strong style="color:#FF4F95">3</strong>
+        Failed
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-item">
+        <strong style="color:#212C6A">44</strong>
+        Total checks
+      </div>
+    </div>
+
+    <div class="body">
+      
+  <div class="tab-nav"><button class="tab-btn active" onclick="switchTab(0)" id="btn-tab-0">Conversational Agents<span class="tab-pills"><span class="pill pass">22</span><span class="pill warn">16</span><span class="pill fail">3</span></span></button><button class="tab-btn" onclick="switchTab(1)" id="btn-tab-1">Channels<span class="tab-pills"><span class="pill pass">1</span><span class="pill warn">2</span></span></button><button class="tab-btn" onclick="switchTab(2)" id="btn-tab-2">Proactive Agents<span class="tab-pills"></span></button></div>
+  <div class="tab-body"><div class="tab-panel active" id="tab-0"><p class="tab-description">The Nexudus AI assistant answers questions, helps members manage their bookings, and guides prospects toward purchasing a day pass, signing up for a membership, or scheduling a private office tour.</p>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Location Details</span>
+      <span class="section-pills"><span class="pill pass">1</span><span class="pill warn">1</span><span class="pill fail">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check fail">
+      <div class="check-header">
+        <span class="badge fail">FAIL</span>
+        <span class="check-name">Location fields</span>
+      </div>
+      <table class="field-table"><tr><td class="field-label">Name</td><td>Nexudus Webinars</td></tr><tr><td class="field-label">Address</td><td class="field-missing">—</td></tr><tr><td class="field-label">City</td><td>Chicago</td></tr><tr><td class="field-label">Postcode</td><td class="field-missing">—</td></tr><tr><td class="field-label">Country</td><td>United States</td></tr><tr><td class="field-label">Phone</td><td class="field-missing">—</td></tr><tr><td class="field-label">Email</td><td class="field-missing">—</td></tr></table>
+      <div class="check-hint">→ Missing: Address, Postcode, Phone, Email. The AI cannot give accurate location information without these fields.</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">Location coordinates set</span>
+      </div>
+      <div class="check-detail">Latitude/Longitude not set. The AI cannot order results by distance from the user.</div>
+      <div class="check-hint">→ Set coordinates on your business profile (Settings &gt; Location).</div>
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Opening hours</span>
+      </div>
+      <table class="field-table"><tr><td class="field-label">Monday</td><td>07:00 – 20:00</td></tr><tr><td class="field-label">Tuesday</td><td>07:00 – 20:00</td></tr><tr><td class="field-label">Wednesday</td><td>07:00 – 20:00</td></tr><tr><td class="field-label">Thursday</td><td>07:00 – 20:00</td></tr><tr><td class="field-label">Friday</td><td>07:00 – 20:00</td></tr><tr><td class="field-label">Saturday</td><td>Closed</td></tr><tr><td class="field-label">Sunday</td><td>Closed</td></tr></table>
+      
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">AI Conversation Assistant — FAQ Articles</span>
+      <span class="section-pills"><span class="pill pass">3</span><span class="pill warn">3</span><span class="pill fail">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Published FAQ articles</span>
+      </div>
+      <div class="check-detail">11 published articles found.</div>
+      
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">1 article with thin body content</span>
+      </div>
+      <div class="check-detail">Under 100 characters: Are dogs allowed in the space?.</div>
+      <div class="check-hint">→ Expand these articles — short content reduces the AI&#x27;s ability to find relevant answers.</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">1 article missing summaries</span>
+      </div>
+      <div class="check-detail">Are dogs allowed in the space?.</div>
+      <div class="check-hint">→ Add a SummaryText to these articles.</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">FAQ articles are organised into groups</span>
+      </div>
+      <div class="check-detail">3 groups: General Information (5), Membership (3), Services (2). 1 article still ungrouped.</div>
+      <div class="check-hint">→ Move ungrouped articles into a named group.</div>
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">FAQ content is up to date</span>
+      </div>
+      <div class="check-detail">All articles updated within the last 12 months.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">FAQ access control configured</span>
+      </div>
+      <div class="check-detail">FAQ visibility is set to: Everyone (any visitor, logged in or not).</div>
+      
+    </div>
+    <div class="check fail">
+      <div class="check-header">
+        <span class="badge fail">FAIL</span>
+        <span class="check-name">4 of 14 expected topics not covered</span>
+      </div>
+      <div class="check-detail">Parking, Mail &amp; deliveries, Noise policy, Accessibility.</div>
+      <div class="check-hint">→ Create articles for these topics. The AI can only answer questions it has content for.</div>
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Rooms &amp; Resources</span>
+      <span class="section-pills"><span class="pill pass">6</span><span class="pill warn">5</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Visible rooms and resources</span>
+      </div>
+      <div class="check-detail">5 visible resources found.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Resource descriptions</span>
+      </div>
+      <div class="check-detail">All 5 resources have descriptions.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Resource capacity</span>
+      </div>
+      <div class="check-detail">All 5 resources have capacity set.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Resource amenity flags</span>
+      </div>
+      <div class="check-detail">All 5 resources have at least one amenity flag set.</div>
+      
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">5 of 5 resources missing booking duration limits</span>
+      </div>
+      <div class="check-detail">DVI Room, HDMI Room, RJ-45 Room and 2 more</div>
+      <div class="check-hint">→ Set MinBookingLength and MaxBookingLength so the AI can answer &#x27;how long can I book it for?&#x27;</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">5 of 5 resources missing advance booking limit</span>
+      </div>
+      <div class="check-detail">DVI Room, HDMI Room, RJ-45 Room and 2 more</div>
+      <div class="check-hint">→ Set BookInAdvanceLimit so the AI can answer &#x27;how far ahead can I book?&#x27;</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">5 of 5 resources missing minimum booking notice</span>
+      </div>
+      <div class="check-detail">DVI Room, HDMI Room, RJ-45 Room and 2 more</div>
+      <div class="check-hint">→ Set LateBookingLimit so the AI can answer &#x27;how much notice do I need to book?&#x27;</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">5 of 5 resources missing cancellation policy</span>
+      </div>
+      <div class="check-detail">DVI Room, HDMI Room, RJ-45 Room and 2 more</div>
+      <div class="check-hint">→ Set LateCancellationLimit so the AI can explain your cancellation rules.</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">5 of 5 resources missing time slots</span>
+      </div>
+      <div class="check-detail">DVI Room, HDMI Room, RJ-45 Room and 2 more</div>
+      <div class="check-hint">→ Add time slots to each resource — without them the AI cannot describe when the room is available for booking.</div>
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Resource pricing</span>
+      </div>
+      <div class="check-detail">All 5 resources have at least one booking rate configured.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Resource visibility</span>
+      </div>
+      <div class="check-detail">All 5 resources are visible to everyone.</div>
+      
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Day Passes</span>
+      <span class="section-pills"><span class="pill pass">8</span><span class="pill warn">2</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">1 product may be a day pass set to the wrong product type</span>
+      </div>
+      <table class="field-table multi-col"><tr><th>Product</th><th>Current type</th><th>Should be</th></tr><tr><td>10 Day Passes</td><td>Other</td><td>Day Pass</td></tr></table>
+      <div class="check-hint">→ These look like day pass products but are not set to product type &#x27;Day Pass&#x27;. Without the correct type they won&#x27;t appear in AI day pass results and can&#x27;t use the AI visibility settings.</div>
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">1 day pass product found</span>
+      </div>
+      <div class="check-detail">Day Pass</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">All day passes published to AI</span>
+      </div>
+      <div class="check-detail">All 1 day pass product has &#x27;Available to AI&#x27; enabled.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Day pass visibility</span>
+      </div>
+      <div class="check-detail">All 1 day pass product is visible.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Day pass descriptions</span>
+      </div>
+      <div class="check-detail">All 1 day pass product have descriptions.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Day pass pricing visible to AI</span>
+      </div>
+      <div class="check-detail">All 1 day pass product has price shown to AI.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">1 day pass using AI price override</span>
+      </div>
+      <div class="check-detail">Day Pass: GBP 22.0 (regular: 25.0)</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Day pass AI notes</span>
+      </div>
+      <div class="check-detail">All 1 day pass product have AI notes set.</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Day pass audience</span>
+      </div>
+      <div class="check-detail">All day passes are available to everyone — the AI can show them to anonymous visitors.</div>
+      
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">No bookable day-use resources</span>
+      </div>
+      <div class="check-detail">The AI surfaces bookable resources with a Resource Kind of Day Pass, Day Office, or Hot Desk alongside day pass products. None exist in this account.</div>
+      <div class="check-hint">→ If you have hot desks or day offices, set their Resource Kind so the AI can include them in results.</div>
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Membership Plans</span>
+      <span class="section-pills"><span class="pill pass">3</span><span class="pill warn">4</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">3 plans published to AI</span>
+      </div>
+      <div class="check-detail">Hot Desk, Parttime Membership, Private Office</div>
+      
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Hot Desk plans available</span>
+      </div>
+      <div class="check-detail">1 visible AI-enabled hot desk plan: Hot Desk.</div>
+      
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">No dedicated desk plans</span>
+      </div>
+      <div class="check-detail">The AI has no plans to show when a prospect asks about dedicated desk options.</div>
+      <div class="check-hint">→ Create at least one dedicated desk plan and enable &#x27;Available to AI&#x27;.</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">No virtual office plans</span>
+      </div>
+      <div class="check-detail">The AI has no plans to show when a prospect asks about virtual office options.</div>
+      <div class="check-hint">→ Create at least one virtual office plan and enable &#x27;Available to AI&#x27;.</div>
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">3 of 3 AI-enabled plans missing descriptions</span>
+      </div>
+      <div class="check-detail">Hot Desk, Parttime Membership, Private Office</div>
+      <div class="check-hint">→ Add descriptions — the AI presents them in the plan card alongside the sign-up link.</div>
+    </div>
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Plan pricing visible to AI</span>
+      </div>
+      <div class="check-detail">All 3 AI-enabled plans have &#x27;Show price to AI&#x27; enabled.</div>
+      
+    </div>
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">3 of 3 AI-enabled plans have no AI notes</span>
+      </div>
+      <div class="check-detail">Hot Desk, Parttime Membership, Private Office</div>
+      <div class="check-hint">→ Add &#x27;Notes for AI&#x27; to describe what&#x27;s included, who the plan suits, or any key terms the AI should convey naturally.</div>
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Private Offices &amp; Tours</span>
+      <span class="section-pills"><span class="pill pass">1</span><span class="pill fail">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">62 private offices on floor plans</span>
+      </div>
+      <div class="check-detail">Desk 1, Desk 2, Desk 7 and 59 more</div>
+      
+    </div>
+    <div class="check fail">
+      <div class="check-header">
+        <span class="badge fail">FAIL</span>
+        <span class="check-name">No private offices published to AI</span>
+      </div>
+      <div class="check-detail">All 62 offices have &#x27;Available to AI&#x27; turned off. The AI cannot present any offices to prospects.</div>
+      <div class="check-hint">→ Enable &#x27;Available to AI&#x27; on each office you want the AI to surface.</div>
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Escalating to Human Support</span>
+      <span class="section-pills"><span class="pill warn">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">AI escalation to human support not enabled</span>
+      </div>
+      <div class="check-detail">When the AI cannot resolve a request or a user asks to speak to someone, it will tell them it cannot connect them to a human agent.</div>
+      <div class="check-hint">→ Enable &#x27;AI escalation to human support&#x27; under Settings › AI Assistants › Channels › AI escalation.</div>
+    </div>
+    </div>
+  </details></div><div class="tab-panel" id="tab-1"><p class="tab-description">The AI assistant supports four channels: Chat, Email, WhatsApp, and Voice. All four share the same capabilities, the same data, and the same visibility rules. The differences are in how conversations are started, how sessions are managed, and how responses are formatted.</p>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Chat</span>
+      <span class="section-pills"><span class="pill pass">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check pass">
+      <div class="check-header">
+        <span class="badge pass">PASS</span>
+        <span class="check-name">Chat channel enabled</span>
+      </div>
+      <div class="check-detail">Chat is available by default on your Nexudus portal — no additional configuration required.</div>
+      
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">WhatsApp</span>
+      <span class="section-pills"><span class="pill warn">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">WhatsApp channel not enabled</span>
+      </div>
+      <div class="check-detail">The AI is not available on WhatsApp for this location.</div>
+      <div class="check-hint">→ Enable WhatsApp under Settings › AI Assistants › Channels › WhatsApp and complete the Twilio configuration.</div>
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Email</span>
+      <span class="section-pills"><span class="pill skip">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check skip">
+      <div class="check-header">
+        <span class="badge skip">SKIP</span>
+        <span class="check-name">Email channel — session data unavailable</span>
+      </div>
+      <div class="check-detail">Could not fetch conversation history to check for email sessions.</div>
+      
+    </div>
+    </div>
+  </details>
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Voice</span>
+      <span class="section-pills"><span class="pill warn">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check warn">
+      <div class="check-header">
+        <span class="badge warn">WARN</span>
+        <span class="check-name">Voice channel not enabled</span>
+      </div>
+      <div class="check-detail">The AI is not available on voice calls for this location.</div>
+      <div class="check-hint">→ Enable Voice under Settings › AI Assistants › Channels › Voice and complete the Twilio and ElevenLabs configuration.</div>
+    </div>
+    </div>
+  </details></div><div class="tab-panel" id="tab-2">
+  <details class="section">
+    <summary class="section-title">
+      <span class="orange-dot"></span>
+      <span class="section-title-text">Proactive AI Agent</span>
+      <span class="section-pills"><span class="pill skip">1</span></span>
+      <span class="section-chevron">›</span>
+    </summary>
+    <div class="section-body">
+      
+    <div class="check skip">
+      <div class="check-header">
+        <span class="badge skip">SKIP</span>
+        <span class="check-name">Configured</span>
+      </div>
+      <div class="check-detail">Not yet defined — awaiting spec.</div>
+      
+    </div>
+    </div>
+  </details></div></div>
+    </div>
+
+    <footer>
+      <span>Nexudus AI Agent Audit · June 2026</span>
+      <span class="watermark">Powered by Nexudus</span>
+    </footer>
+
+  </div>
+  <script>
+    function switchTab(i) {
+      document.querySelectorAll('.tab-btn').forEach((b, idx) => b.classList.toggle('active', idx === i));
+      document.querySelectorAll('.tab-panel').forEach((p, idx) => p.classList.toggle('active', idx === i));
+    }
+  </script>
+</body>
+</html>
